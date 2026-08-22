@@ -1,0 +1,25 @@
+{
+  "name": "mmm-bom-current",
+  "version": "1.0.0",
+  "description": "MagicMirror² module that displays current weather observations from the Australian Bureau of Meteorology (BOM) public JSON feed.",
+  "main": "MMM-BOM-Current.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kmbrimble/MMM-BOM-Current.git"
+  },
+  "keywords": [
+    "MagicMirror",
+    "BOM",
+    "weather",
+    "australia"
+  ],
+  "author": "Kieren McDonald",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kmbrimble/MMM-BOM-Current/issues"
+  },
+  "homepage": "https://github.com/kmbrimble/MMM-BOM-Current#readme"
+}
