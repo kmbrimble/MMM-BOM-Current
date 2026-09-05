@@ -60,6 +60,7 @@ Add the module to the `modules` array in `config/config.js`:
 | `updateInterval`   | *Optional* — how often to poll BOM, in milliseconds. Default: `600000` (10 minutes). |
 | `animationSpeed`   | *Optional* — DOM update animation speed, in milliseconds. Default: `1000`. |
 | `units`            | *Optional* — currently informational only; BOM's feed returns metric units. Default: `"metric"`. |
+| `lat`, `lon`       | *Optional* — latitude/longitude used to compute sunrise, sunset and civil twilight times shown under the observations. Default: Brisbane (`-27.5333`, `152.9333`). |
 
 ## Notes
 
@@ -67,6 +68,8 @@ Add the module to the `modules` array in `config/config.js`:
   can otherwise reject requests from non-browser clients.
 - BOM's public feeds are unauthenticated and rate-limit-sensitive — don't set
   `updateInterval` below a few minutes.
+- Sunrise/sunset/civil twilight are computed locally (`suntimes.js`) from `lat`/`lon` — BOM's
+  observation feed doesn't carry them, so no extra network request is made.
 - Requires the `weather-icons` CSS (bundled with MagicMirror core) for the weather icon glyphs.
 
 ## License

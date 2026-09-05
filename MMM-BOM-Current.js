@@ -11,10 +11,16 @@ Module.register("MMM-BOM-Current", {
         updateInterval: 10 * 60 * 1000, // 10 minutes
         animationSpeed: 1000,
         units: "metric",
+        lat: -27.5333, // Brisbane -- matches MMM-BOM-Forecast's default location
+        lon: 152.9333,
     },
 
     getStyles: function() {
         return ["weather-icons.css"];
+    },
+
+    getScripts: function() {
+        return ["suntimes.js"];
     },
 
     start: function() {
@@ -110,6 +116,22 @@ Module.register("MMM-BOM-Current", {
                  if (windSpeed) detailsHTML += " &nbsp;|&nbsp; "; 
                  detailsHTML += `<span class="wi wi-humidity"></span> ${humidity}%`;
             }
+        }
+
+        // --- 4. Sun times ---
+        if (typeof calculateSunTimes === "function") {
+            var formatTime = function(d) {
+                if (!d) return "--:--";
+                var h = d.getHours(), m = d.getMinutes();
+                return (h < 10 ? "0" : "") + h + ":" + (m < 10 ? "0" : "") + m;
+            };
+            var sun = calculateSunTimes(this.config.lat, this.config.lon, new Date());
+
+            detailsHTML += "<br>";
+            detailsHTML += `<span class="wi wi-sunrise"></span> ${formatTime(sun.sunrise)}`;
+            detailsHTML += " &nbsp;|&nbsp; ";
+            detailsHTML += `<span class="wi wi-sunset"></span> ${formatTime(sun.sunset)}`;
+            detailsHTML += `<br><span class="weather-civil-twilight">Civil twilight ${formatTime(sun.civilDawn)}–${formatTime(sun.civilDusk)}</span>`;
         }
 
         detailsDiv.innerHTML = detailsHTML;
