@@ -1,0 +1,40 @@
+name: CI
+
+# Gitea is the primary forge (GitHub is a read-only push mirror). The job below is the required status check on master
+# ("CI / check (pull_request)"). These modules have no unit test suite, so the gate is: every JS file parses, the module's
+# own self-checks pass, and node_helper.js loads against a stub of MagicMirror's node_helper module. The behavioural
+# test is the e2e suite in the magicmirror2 repo.
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+
+      - name: Syntax check every JS file
+        run: |
+          set -euo pipefail
+          for f in $(git ls-files '*.js'); do
+            node --check "$f"
+          done
+
+      - name: Self-checks and tracked-file hygiene
+        run: |
+          set -euo pipefail
+          # suntimes.js is a local-timezone function by design (it returns the sun events that fall on the *local* calendar day), so its
+          # self-check only means anything in the deployment timezone: the kiosk runs MagicMirror in Brisbane time. On a UTC runner it fails.
+          TZ=Australia/Brisbane node suntimes.js
+
+      - name: node_helper loads (stubbed MagicMirror)
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/stub"
+          cat > "$RUNNER_TEMP/stub/node_helper.js" <<'JS'
+          module.exports = { create: (definition) => Object.assign({ sendSocketNotification() {} }, definition) };
+          JS
+          NODE_PATH="$RUNNER_TEMP/stub" node -e "const h = require('./node_helper.js'); if (typeof h.socketNotificationReceived !== 'function') throw new Error('node_helper does not export socketNotificationReceived'); console.log('node_helper loads')"
