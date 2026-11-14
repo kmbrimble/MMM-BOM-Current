@@ -26,8 +26,7 @@ civil twilight. Original code, MIT licensed. Full option reference in README.md.
 
 **Gitea is primary; GitHub is a read-only push mirror and must never be pushed to directly** (the mirror force-syncs and prunes refs; Gitea syncs on every push and every 10 minutes).
 Work on `https://git.kiztigs.com/kmbrimble/MMM-BOM-Current` (`origin`, gt credential helper); use `gt`, not `gh`, for issues and PRs. `master` is protected: PR + the green `CI / check (pull_request)` check
-(`.gitea/workflows/ci.yml`); butler-bot merges its own green PRs. GitHub has Issues, Wiki, Projects, Discussions and PRs switched off. The reason this repo stays public on GitHub is that magicmirror2
-consumes it as a submodule through its GitHub URL (see below), and so that others can clone the module.
+(`.gitea/workflows/ci.yml`); butler-bot merges its own green PRs. GitHub has Issues, Wiki, Projects, Discussions and PRs switched off. The GitHub copy stays only so that others can clone the module; magicmirror2 consumes this module as a submodule through its **Gitea** URL (see below).
 
 ## How this repo is consumed
 
@@ -39,14 +38,13 @@ points at, not this repo's `master`.
 **A change here is not deployed until the parent's pointer is bumped.** The flow is:
 
 1. Change it on a branch here, push the branch **to Gitea**, open a PR (`gt pr create`); butler-bot merges it when the required `CI / check (pull_request)` is green. (Direct pushes to `master` are rejected.)
-2. **Wait for the mirror to deliver the merge commit to GitHub**: `git ls-remote https://github.com/kmbrimble/MMM-BOM-Current.git refs/heads/master` must equal Gitea's (seconds, at most 10 minutes). magicmirror2's `.gitmodules`
-   URL, and therefore the live host checkout's `git submodule update`, fetch this module from **GitHub**, so a commit that is not mirrored yet cannot be deployed.
+2. Confirm the merge commit is on Gitea: `git ls-remote https://git.kiztigs.com/kmbrimble/MMM-BOM-Current.git refs/heads/master`. magicmirror2's `.gitmodules` URL, and therefore the live host checkout's `git submodule update`, fetch this module from **Gitea** (since 15 Nov 2026), so there is no mirror wait.
 3. In the magicmirror2 checkout: `git -C modules/MMM-BOM-Current fetch origin && git -C modules/MMM-BOM-Current checkout <sha>`, then
    `git add modules/MMM-BOM-Current` and commit ("Bump MMM-BOM-Current to <sha>: ...") via a magicmirror2 PR.
 4. Deploy per magicmirror2's CLAUDE.md: pull the live clone,
    `git submodule update --init --recursive`, `docker restart MagicMirror`.
 
-Merge this repo (and let it mirror) before merging the parent bump — a parent pointing at a commit that isn't on
+Merge this repo before merging the parent bump — a parent pointing at a commit that isn't on
 GitHub yet breaks the live host checkout and every other clone.
 
 ## Testing
